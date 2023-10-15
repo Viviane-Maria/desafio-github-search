@@ -3,15 +3,19 @@ package br.com.igorbag.githubsearch.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import br.com.igorbag.githubsearch.R
 import br.com.igorbag.githubsearch.domain.Repository
+import br.com.igorbag.githubsearch.ui.MainActivity
 
-class RepositoryAdapter(private val repositories: List<Repository>) :
+class RepositoryAdapter(private val repositories: List<Repository>, private val mainActivity: MainActivity) :
     RecyclerView.Adapter<RepositoryAdapter.ViewHolder>() {
 
-    var carItemLister: (Repository) -> Unit = {}
-    var btnShareLister: (Repository) -> Unit = {}
+    var repositoryItemListener: (Repository) -> Unit = {}
+    var repositoryShareListener: (Repository) -> Unit = {}
+
 
     // Cria uma nova view
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,11 +39,27 @@ class RepositoryAdapter(private val repositories: List<Repository>) :
         //holder.favorito.setOnClickListener {
         //    btnShareLister(repositores[position])
         //}
+        val repository = repositories[position]
+        holder.bind(repository)
+
+        // Exemplo de click no item
+        holder.itemView.setOnClickListener {
+            repositoryItemListener(repository)
+            mainActivity.openBrowser(repository.htmlUrl)
+        }
+
+        // Exemplo de click no btn Share
+        holder.ivShare.setOnClickListener {
+            repositoryShareListener(repository)
+            mainActivity.shareRepositoryLink(repository.htmlUrl)
+
+        }
+
     }
 
     // Pega a quantidade de repositorios da lista
     //@TODO 9 - realizar a contagem da lista
-    override fun getItemCount(): Int = 0
+    override fun getItemCount(): Int = repositories.size
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         //@TODO 10 - Implementar o ViewHolder para os repositorios
@@ -50,7 +70,14 @@ class RepositoryAdapter(private val repositories: List<Repository>) :
         //    view.apply {
         //        atributo = findViewById(R.id.item_view)
         //    }
+        val repositoryName: TextView = view.findViewById(R.id.tv_repository_name)
+        val ivShare: ImageView = view.findViewById(R.id.iv_share)
 
+        // Método para realizar o bind dos dados do repositório ao ViewHolder
+        fun bind(repository: Repository) {
+            repositoryName.text = repository.name
+
+        }
     }
 }
 
